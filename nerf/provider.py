@@ -106,17 +106,17 @@ def rand_poses(size, device, opt, radius_range=[1, 1.5], theta_range=[0, 120], p
         phis = torch.rand(size, device=device) * (phi_range[1] - phi_range[0]) + phi_range[0]
         phis[phis < 0] += 2 * np.pi
 
-        # centers = torch.stack([
-        #     radius * torch.sin(thetas) * torch.sin(phis),
-        #     radius * torch.cos(thetas),
-        #     radius * torch.sin(thetas) * torch.cos(phis),
-        # ], dim=-1) # [B, 3]
-
         centers = torch.stack([
             radius * torch.sin(thetas) * torch.sin(phis),
-            radius * torch.sin(thetas) * torch.cos(phis),
             radius * torch.cos(thetas),
+            radius * torch.sin(thetas) * torch.cos(phis),
         ], dim=-1) # [B, 3]
+
+        # centers = torch.stack([
+        #     radius * torch.sin(thetas) * torch.sin(phis),
+        #     radius * torch.sin(thetas) * torch.cos(phis),
+        #     radius * torch.cos(thetas),
+        # ], dim=-1) # [B, 3]
 
     targets = 0
 
@@ -129,8 +129,8 @@ def rand_poses(size, device, opt, radius_range=[1, 1.5], theta_range=[0, 120], p
 
     # lookat
     forward_vector = safe_normalize(centers - targets)
-    # up_vector = torch.FloatTensor([0, 1, 0]).to(device).unsqueeze(0).repeat(size, 1)
-    up_vector = torch.FloatTensor([0, 0, 1]).to(device).unsqueeze(0).repeat(size, 1)
+    up_vector = torch.FloatTensor([0, 1, 0]).to(device).unsqueeze(0).repeat(size, 1)
+    # up_vector = torch.FloatTensor([0, 0, 1]).to(device).unsqueeze(0).repeat(size, 1)
     right_vector = safe_normalize(torch.cross(forward_vector, up_vector, dim=-1))
 
     if opt.jitter_pose:
@@ -163,22 +163,22 @@ def circle_poses(device, radius=torch.tensor([3.2]), theta=torch.tensor([60]), p
     angle_overhead = angle_overhead / 180 * np.pi
     angle_front = angle_front / 180 * np.pi
 
-    # centers = torch.stack([
-    #     radius * torch.sin(theta) * torch.sin(phi),
-    #     radius * torch.cos(theta),
-    #     radius * torch.sin(theta) * torch.cos(phi),
-    # ], dim=-1) # [B, 3]
-
     centers = torch.stack([
         radius * torch.sin(theta) * torch.sin(phi),
-        radius * torch.sin(theta) * torch.cos(phi),
         radius * torch.cos(theta),
+        radius * torch.sin(theta) * torch.cos(phi),
     ], dim=-1) # [B, 3]
+
+    # centers = torch.stack([
+    #     radius * torch.sin(theta) * torch.sin(phi),
+    #     radius * torch.sin(theta) * torch.cos(phi),
+    #     radius * torch.cos(theta),
+    # ], dim=-1) # [B, 3]
 
     # lookat
     forward_vector = safe_normalize(centers)
-    # up_vector = torch.FloatTensor([0, 1, 0]).to(device).unsqueeze(0).repeat(len(centers), 1)
-    up_vector = torch.FloatTensor([0, 0, 1]).to(device).unsqueeze(0).repeat(len(centers), 1)
+    up_vector = torch.FloatTensor([0, 1, 0]).to(device).unsqueeze(0).repeat(len(centers), 1)
+    # up_vector = torch.FloatTensor([0, 0, 1]).to(device).unsqueeze(0).repeat(len(centers), 1)
     right_vector = safe_normalize(torch.cross(forward_vector, up_vector, dim=-1))
     up_vector = safe_normalize(torch.cross(right_vector, forward_vector, dim=-1))
 
